@@ -1,0 +1,69 @@
+import csv
+from collections import defaultdict
+from datetime import datetime
+
+
+# Function to get today's date in yyyy-mm-dd format
+def get_today_date():
+    return datetime.now().strftime('%Y-%m-%d')
+
+
+# Function to add expense to CSV file
+def add_expense(amount, category, description):
+    with open('expenses.csv', mode='a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([get_today_date(), amount, category, description])
+    print("Expense added successfully.")
+
+
+# Function to display monthly summary
+def display_monthly_summary():
+    current_month = datetime.now().strftime('%Y-%m')
+    total_spent = 0
+    category_spending = defaultdict(int)
+
+    with open('expenses.csv', mode='r') as file:
+        reader = csv.reader(file)
+        next(reader)  # Skip header row
+        for row in reader:
+            date, amount, category, description = row
+            if date.startswith(current_month):
+                total_spent += float(amount)
+                category_spending[category] += float(amount)
+
+    print(f"Monthly Summary ({current_month}):")
+    print(f"Total spent: ${total_spent:.2f}")
+    print("Category-wise spending:")
+    for category, amount in category_spending.items():
+        print(f"{category}: ${amount:.2f}")
+
+
+# Main function to interact with user
+def main():
+    while True:
+        print("\nExpense Tracker Menu:")
+        print("1. Add Expense")
+        print("2. View Monthly Summary")
+        print("3. Exit")
+
+        choice = input("Enter your choice (1/2/3): ")
+
+        if choice == '1':
+            amount = input("Enter amount spent: ")
+            category = input("Enter category (e.g., food, transportation): ")
+            description = input("Enter description: ")
+            add_expense(amount, category, description)
+
+        elif choice == '2':
+            display_monthly_summary()
+
+        elif choice == '3':
+            print("Exiting Expense Tracker. Goodbye!")
+            break
+
+        else:
+            print("Invalid choice. Please enter 1, 2, or 3.")
+
+
+if __name__ == "__main__":
+    main()
